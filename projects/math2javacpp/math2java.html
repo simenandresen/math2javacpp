@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+	<title> Java and C++  Math Code Generator </title>
+		<script type="text/javascript" src="math2java.js"></script>
+	</head>
+	
+	<body>
+		<h2>Java Math generator</h2>
+		<br />Convert simple mathematical equations to Java or C++ syntax			
+		<BR>
+		Enter mathematical equations: <BR>
+		<FORM NAME="myform" ACTION="" METHOD="GET">
+	
+		<table STYLE="vertical-align:top;"  >
+			<tr>
+				<td><TEXTAREA ID="f1_in" NAME="maxima_text" ROWS="3"  COLS="70"></TEXTAREA>	</td>
+				<td id="f1_out"  STYLE="vertical-align:top;"></td>
+				<br>
+						
+			</tr>
+			<tr>
+				<td>	<TEXTAREA ID="f2_in" NAME="maxima_text" ROWS="3"  COLS="70"></TEXTAREA>	</td>
+				<td id="f2_out"  STYLE="vertical-align:top;"></td>
+			
+			</tr>
+			<tr>
+				<td>	<TEXTAREA ID="f3_in" NAME="maxima_text" ROWS="3"  COLS="70"></TEXTAREA>	</td>
+				<td id="f3_out"  STYLE="vertical-align:top;"></td>
+				
+			</tr>
+			<tr>
+				<td>	<TEXTAREA ID="f4_in" NAME="maxima_text" ROWS="3"  COLS="70"></TEXTAREA>	</td>
+				<td id="f4_out"  STYLE="vertical-align:top;"></td>
+			</tr>
+
+	</table>
+         <input type="radio" name="syntax" value="java" checked/>Java
+         <input type="radio" name="syntax" value="c++" />C++<br />
+	
+		<INPUT TYPE="button"  NAME="button" Value="Convert" onClick="convert_to_java()">
+		</FORM>
+<br>
+	<div id="error"></div><br>
+	<div id="status"></div>	
+	<footer> 
+		<p> Simen Andresen &copy 2012
+	</footer>
+	</body>
+</html>
