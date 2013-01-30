@@ -1,4 +1,4 @@
-/* 
+/* i 
  *	Javascript to convert regular math expressions
  *	to Java or c++ syntax
  *
@@ -17,9 +17,7 @@ function convert_to_java(){
 
 function convert(fin,fout){
 	var f= document.getElementById(fin).value;
-	if(document.myform.syntax[0].checked==true){  // fix to Math.sin only for java
-		f=fixTrigFunctions(f);
-	}
+	f=fixTrigFunctions(f);
 	f=fixExpFunctions(f);	
 	if (check_matching_brackets(f)==false){
 		document.getElementById("error").innerHTML="<br> Brackets not matching: Error!";
@@ -31,23 +29,27 @@ function convert(fin,fout){
 }
 
 function fixTrigFunctions(line){
-	line = new String(line);
-	var rx = /sin\(.*?\)|cos\(.*?\)|tan\(.*?\)/g;
-	var matches = new Array();
-	while((match = rx.exec(line)) !== null){
-    	matches.push(match);
-	}
-	var new_word;
-	var rege;
-	var r1;	var r3;var r2;var temp;
-	for (i=0;i<matches.length;i++){
-		new_word="Math.".concat(matches[i]);
-		r1=/\)[\*\-\+\/\w\[\]\^]*?\(/; 
-		r2=(new String(matches[i]));
-		r3=/(?!.htaM)/;
-		rege=new RegExp(r1.source+r2.substr(0,3).reverse() + r3.source,"g");
-		line= line.reverse().replace(rege, new_word.reverse()).reverse();
-	}
+
+		line = new String(line);
+		var rx = /sin\(.*?\)|cos\(.*?\)|tan\(.*?\)/g;
+		var matches = new Array();
+		while((match = rx.exec(line)) !== null){
+	   	 	matches.push(match);
+		}
+		var new_word;
+		var rege;
+		var r1;	var r3;var r2;var temp;
+		for (i=0;i<matches.length;i++){
+			line=line.replace(matches[i], '('+matches[i]+')'); // put braces around for easier exponent match
+			if(document.myform.syntax[0].checked==true){  // fix to Math.sin only for java
+				new_word="Math.".concat(matches[i]);
+				r1=/\)[\*\-\+\/\w\[\]\^]*?\(/; 
+				r2=(new String(matches[i]));
+				r3=/(?!.htaM)/;
+				rege=new RegExp(r1.source+r2.substr(0,3).reverse() + r3.source,"g");
+				line=line.reverse().replace(rege, new_word.reverse()).reverse();
+			}	
+		}
 	return line;
 }
 
@@ -96,7 +98,7 @@ function fixExpFunctions(line){
 				line=insert_and_replace(line,'Math.pow'+'('+line.slice(first_bracket,exp_index)+','+exponent+')',first_bracket, exp_index+2);                  
 			}else{
 				line=insert_and_replace(line,'pow'+'('+line.slice(first_bracket,exp_index)+','+exponent+')',first_bracket, exp_index+2);                  
-		}
+			}
 		//if exponential without brackets (something)^2 
 		}else if (line.charAt(exp_index-1)==')'){
 			var brack_pairs=0;
@@ -109,6 +111,11 @@ function fixExpFunctions(line){
 					first_bracket=i;
 					break;
 				}
+			}
+			if(document.myform.syntax[0].checked==true){  // fix to Math.sin only for java
+				line=insert_and_replace(line,'Math.pow'+'('+line.slice(first_bracket,exp_index)+','+exponent+')',first_bracket, exp_index+2);                  
+			}else{
+				line=insert_and_replace(line,'pow'+'('+line.slice(first_bracket,exp_index)+','+exponent+')',first_bracket, exp_index+2);                  
 			}
 		}else{
 			document.getElementById("error").innerHTML="syntax error in Maxima code!";
