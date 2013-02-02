@@ -9,15 +9,17 @@
 
 function convert_to_java(){
 	convert("f1_in", "f1_out");
-//	convert("f2_in", "f2_out");
-//	convert("f3_in", "f3_out");
-//	convert("f4_in", "f4_out");
+	convert("f2_in", "f2_out");
+	convert("f3_in", "f3_out");
+	convert("f4_in", "f4_out");
 
 }
 
 function convert(fin,fout){
 	var f= document.getElementById(fin).value;
-	f=fixTrigFunctions(f);
+	if(document.myform.syntax[0].checked==true){  // fix to Math.sin only for java
+		f=fixTrigFunctions_java(f);
+	}
 	f=fixExpFunctions(f);	
 	if (check_matching_brackets(f)==false){
 		document.getElementById("error").innerHTML="<br> Brackets not matching: Error!";
@@ -28,7 +30,8 @@ function convert(fin,fout){
 	}
 }
 
-function fixTrigFunctions(line){
+
+function fixTrigFunctions_java(line){
 	var trigs = new Array("sin(", "cos(", "tan(");
 	var trig_lengths=new Array(3,3,3);
 	var start_indexes=new Array();
@@ -66,28 +69,25 @@ function fixTrigFunctions(line){
 	if(document.myform.syntax[0].checked==true){  // fix to Math.sin only for java
 		for(var i=0;i<trigs.length;i++){
 			for(var j=0;j<start_indexes[i].length;j++){
-				line=insert_and_replace(line,"(Mat.", start_indexes[i][j]-3,start_indexes[i][j]-3);
-				line=insert_and_replace(line,")",end_indexes[i][j]+6,end_indexes[i][j]+6);
+				line=insert_and_replace(line,"Mat.", start_indexes[i][j]-3,start_indexes[i][j]-3);
 				// update indexes	
 				for(var k=0;k<end_indexes.length;k++){
 					for(var l=0;l<end_indexes[k].length;l++){
 						if(start_indexes[k][l]>start_indexes[i][j]){
-							start_indexes[k][l]=start_indexes[k][l]+5;
-							end_indexes[k][l]=end_indexes[k][l]+5;
+							start_indexes[k][l]=start_indexes[k][l]+4;
+							end_indexes[k][l]=end_indexes[k][l]+4;
 						}
-						if(start_indexes[k][l]>end_indexes[i][j]+3){
-							start_indexes[k][l]=start_indexes[k][l]+1;
-						}
-						if(start_indexes[k][l]>end_indexes[i][j]){
-							end_indexes[k][l]=end_indexes[k][l]+1;
-						}
+					//	if(start_indexes[k][l]>end_indexes[i][j]+3){
+					//		start_indexes[k][l]=start_indexes[k][l]+1;
+					//	}
+					//	if(start_indexes[k][l]>end_indexes[i][j]){
+					//		end_indexes[k][l]=end_indexes[k][l]+1;
+					//	}
 					}
 				}
 			}
 		}	
 	}
-	
-	
 	return line;
 }
 
@@ -175,8 +175,20 @@ function fixExpFunctions(line){
 				}else if (line.charAt(i)=='('){
 					brack_pairs-=1;
 				}if (brack_pairs==0){
-					first_bracket=i;
-					break;
+					if(i>2){
+						var sub=line.substring(i-3,i);
+						if(sub.match(/sin/g)|| sub.match(/tan/g) || sub.match(/cos/g)){
+							if(document.myform.syntax[0].checked==true)	{
+								first_bracket=i-7;
+							}else{
+								first_bracket=i-3;
+							}
+						}
+						break;
+					}else{
+						first_bracket=i;
+						break;
+					}
 				}
 			}
 			if(document.myform.syntax[0].checked==true){  // fix to Math.sin only for java
@@ -188,7 +200,6 @@ function fixExpFunctions(line){
 			document.getElementById("error").innerHTML="syntax error in Maxima code!";
 		}		
 		exp_index=line.indexOf('^');
-		//exp_index=null;	
 	}
     return line;
 }
