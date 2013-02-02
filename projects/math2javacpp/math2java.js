@@ -9,9 +9,9 @@
 
 function convert_to_java(){
 	convert("f1_in", "f1_out");
-	convert("f2_in", "f2_out");
-	convert("f3_in", "f3_out");
-	convert("f4_in", "f4_out");
+//	convert("f2_in", "f2_out");
+//	convert("f3_in", "f3_out");
+//	convert("f4_in", "f4_out");
 
 }
 
@@ -29,28 +29,95 @@ function convert(fin,fout){
 }
 
 function fixTrigFunctions(line){
-
-		line = new String(line);
-		var rx = /sin\(.*?\)|cos\(.*?\)|tan\(.*?\)/g;
-		var matches = new Array();
-		while((match = rx.exec(line)) !== null){
-	   	 	matches.push(match);
+	var trigs = new Array("sin(", "cos(", "tan(");
+	var trig_lengths=new Array(3,3,3);
+	var start_indexes=new Array();
+	var end_indexes = new Array();
+	var index=0;
+	var term=0;
+	for(var i=0;i<trigs.length;i++){
+		start_indexes[i]=new Array();
+		end_indexes[i]=new Array();
+		index=0;
+		// make an array of indices for start of trigs
+		term=line.indexOf(trigs[i],index);
+		while(term !=-1){
+			start_indexes[i].push(term+trig_lengths[i]);
+			index=term+2;
+			term=line.indexOf(trigs[i],index);
 		}
-		var new_word;
-		var rege;
-		var r1;	var r3;var r2;var temp;
-		for (i=0;i<matches.length;i++){
-			line=line.replace(matches[i], '('+matches[i]+')'); // put braces around for easier exponent match
-			if(document.myform.syntax[0].checked==true){  // fix to Math.sin only for java
-				new_word="Math.".concat(matches[i]);
-				r1=/\)[\*\-\+\/\w\[\]\^]*?\(/; 
-				r2=(new String(matches[i]));
-				r3=/(?!.htaM)/;
-				rege=new RegExp(r1.source+r2.substr(0,3).reverse() + r3.source,"g");
-				line=line.reverse().replace(rege, new_word.reverse()).reverse();
+		// find matching brakcets
+		for(var j=0;j<start_indexes[i].length;j++){
+			var brack_pairs=0;
+			for(var k=start_indexes[i][j]; k < line.length;k++){
+				if (line.charAt(k)==')'){ 
+					brack_pairs+=1;
+				}else if (line.charAt(k)=='('){
+					brack_pairs-=1;
+				}if (brack_pairs==0){
+					end_indexes[i].push(k);
+					break;
+				}
+			}
+		}
+	}
+	var cnt1=0;
+	var cnt=0;
+	if(document.myform.syntax[0].checked==true){  // fix to Math.sin only for java
+		for(var i=0;i<trigs.length;i++){
+			for(var j=0;j<start_indexes[i].length;j++){
+				line=insert_and_replace(line,"(Mat.", start_indexes[i][j]-3,start_indexes[i][j]-3);
+				line=insert_and_replace(line,")",end_indexes[i][j]+6,end_indexes[i][j]+6);
+				// update indexes	
+				for(var k=0;k<end_indexes.length;k++){
+					for(var l=0;l<end_indexes[k].length;l++){
+						if(start_indexes[k][l]>start_indexes[i][j]){
+							start_indexes[k][l]=start_indexes[k][l]+5;
+							end_indexes[k][l]=end_indexes[k][l]+5;
+						}
+						if(start_indexes[k][l]>end_indexes[i][j]+3){
+							start_indexes[k][l]=start_indexes[k][l]+1;
+						}
+						if(start_indexes[k][l]>end_indexes[i][j]){
+							end_indexes[k][l]=end_indexes[k][l]+1;
+						}
+					}
+				}
+			}
+		}	
+	}
+	
+	
+	return line;
+}
+
+function update_trig_end_indexes(end,i,j){
+	var ny_end=end;
+	for(var k=0;k<end.length;k++){
+		for(var l=0;l<end[k].length;l++){
+			if(end[k][l]>end[i][j]){
+				ny_end[k][l]=end[k][l]+5;
 			}	
 		}
-	return line;
+	}	
+	return ny_end;
+}
+function update_trig_start_indexes(start,i,j){
+	var ny_start=start;
+	for(var k=0;k<start.length;k++){
+		for(var l=0;l<start[k].length;l++){
+			if(end[k][l]>end[i][j]){
+				ny_start[k][l]=start[k][l]+5;
+			}	
+		}
+	}	
+	return ny_start;
+}
+
+function print(string){
+	var old_string=document.getElementById("error").innerHTML;
+	document.getElementById("error").innerHTML=old_string.concat(string);
+	
 }
 
 function insert_and_replace(string, inserted_string, index1, index2){

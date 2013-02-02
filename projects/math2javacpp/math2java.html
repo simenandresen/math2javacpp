@@ -11,8 +11,14 @@
 		<br />Convert simple mathematical equations to Java or C++ syntax			
 		<BR>
 		Enter mathematical equations: <BR>
+		<p>
+		<p>
 		<FORM NAME="myform" ACTION="" METHOD="GET">
 	
+         <input type="radio" name="syntax" value="java" checked/>Java
+         <input type="radio" name="syntax" value="c++" />C++<br />
+	
+		<INPUT TYPE="button"  NAME="button" Value="Convert" onClick="convert_to_java()">
 		<table STYLE="vertical-align:top;"  >
 			<tr>
 				<td><TEXTAREA ID="f1_in" NAME="maxima_text" ROWS="3"  COLS="70"></TEXTAREA>	</td>
@@ -36,10 +42,6 @@
 			</tr>
 
 	</table>
-         <input type="radio" name="syntax" value="java" checked/>Java
-         <input type="radio" name="syntax" value="c++" />C++<br />
-	
-		<INPUT TYPE="button"  NAME="button" Value="Convert" onClick="convert_to_java()">
 		</FORM>
 <br>
 	<div id="error"></div><br>
