@@ -77,12 +77,6 @@ function fixTrigFunctions_java(line){
 							start_indexes[k][l]=start_indexes[k][l]+4;
 							end_indexes[k][l]=end_indexes[k][l]+4;
 						}
-					//	if(start_indexes[k][l]>end_indexes[i][j]+3){
-					//		start_indexes[k][l]=start_indexes[k][l]+1;
-					//	}
-					//	if(start_indexes[k][l]>end_indexes[i][j]){
-					//		end_indexes[k][l]=end_indexes[k][l]+1;
-					//	}
 					}
 				}
 			}
@@ -153,6 +147,22 @@ function fixExpFunctions(line){
 	var first_bracket;
 	while (exp_index>-1){
 		var exponent=line.charAt(exp_index+1);
+		var exp_end=exp_index+1; 
+		if(line.charAt(exp_index+1)=='('){
+			var brack_pair=1;
+			exp_end++;
+			while(brack_pair!=0){
+				if(line.charAt(exp_end)=='('){
+					brack_pair++;
+				}else if(line.charAt(exp_end)==')'){
+					brack_pair--;
+				}exp_end++;
+			}
+		}else{
+			while(line.charAt(exp_end).match(/[a-zA-Z0-9]/) ){
+				exp_end++;
+			}
+		}
 		// the exponential is outside brackets -> something^2
 		if  (!(line.charAt(exp_index-1)==')')){
 			for (i=exp_index-1 ; i>=0; i--){ 
@@ -162,9 +172,9 @@ function fixExpFunctions(line){
 				}
 			}
 			if(document.myform.syntax[0].checked==true){  // fix to Math.sin only for java
-				line=insert_and_replace(line,'Math.pow'+'('+line.slice(first_bracket,exp_index)+','+exponent+')',first_bracket, exp_index+2);                  
+				line=insert_and_replace(line,'Math.pow'+'('+line.slice(first_bracket,exp_index)+','+line.slice(exp_index+1,exp_end)+')',first_bracket, exp_end);                  
 			}else{
-				line=insert_and_replace(line,'pow'+'('+line.slice(first_bracket,exp_index)+','+exponent+')',first_bracket, exp_index+2);                  
+				line=insert_and_replace(line,'pow'+'('+line.slice(first_bracket,exp_index)+','+line.slice(exp_index+1,exp_end)+')',first_bracket, exp_end);                  
 			}
 		//if exponential without brackets (something)^2 
 		}else if (line.charAt(exp_index-1)==')'){
@@ -192,12 +202,12 @@ function fixExpFunctions(line){
 				}
 			}
 			if(document.myform.syntax[0].checked==true){  // fix to Math.sin only for java
-				line=insert_and_replace(line,'Math.pow'+'('+line.slice(first_bracket,exp_index)+','+exponent+')',first_bracket, exp_index+2);                  
+				line=insert_and_replace(line,'Math.pow'+'('+line.slice(first_bracket,exp_index)+','+line.slice(exp_index+1,exp_end)+')',first_bracket, exp_end);    
 			}else{
-				line=insert_and_replace(line,'pow'+'('+line.slice(first_bracket,exp_index)+','+exponent+')',first_bracket, exp_index+2);                  
+				line=insert_and_replace(line,'pow'+'('+line.slice(first_bracket,exp_index)+','+line.slice(exp_index+1,exp_end)+')',first_bracket, exp_end);         
 			}
 		}else{
-			document.getElementById("error").innerHTML="syntax error in Maxima code!";
+			document.getElementById("error").innerHTML="syntax error in math equation!";
 		}		
 		exp_index=line.indexOf('^');
 	}
